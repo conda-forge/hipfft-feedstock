@@ -2,17 +2,9 @@
 
 set -xeuo pipefail
 
-mkdir build
-pushd build
-
-export DEVICE_LIB_PATH=${DEVICE_LIB_PATH}/amdgcn/bitcode
-
-cmake ${CMAKE_ARGS} \
-    -DCMAKE_CXX_COMPILER=hipcc \
-    -DCMAKE_MODULE_PATH:PATH=$PREFIX/lib/cmake/hip \
-    -DHIP_CLANG_PATH:PATH=$PREFIX/bin \
-    ..
-
-make -j${CPU_COUNT}
-
-make install
+cmake -GNinja ${CMAKE_ARGS} \
+    -DGPU_TARGETS=${CONDA_FORGE_DEFAULT_ROCM_GPU_TARGETS} \
+    -DAMDGPU_TARGETS=${CONDA_FORGE_DEFAULT_ROCM_GPU_TARGETS} \
+    -Bbuild -S.
+cmake --build ./build
+cmake --install ./build
